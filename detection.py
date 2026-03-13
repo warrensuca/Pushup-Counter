@@ -2,7 +2,7 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 import time
-
+import np
 model_path = 'assets/pose_landmarker_full.task'
 
 BaseOptions = mp.tasks.BaseOptions
@@ -29,8 +29,12 @@ POSE_CONNECTIONS = [
 ]
 
 
+
+
+
+
 def print_result(result: PoseLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
-    global latest_frame
+    global latest_frame, count, inDownPos
 
     frame = cv2.cvtColor(output_image.numpy_view().copy(), cv2.COLOR_RGB2BGR)
 
@@ -52,7 +56,13 @@ def print_result(result: PoseLandmarkerResult, output_image: mp.Image, timestamp
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 cv2.circle(frame, (cx, cy), 5, ( (0, 255, 0) if inDownPos else (111, 64, 125)), -1)
 
+            #pushup detection
             
+            if(pose[11].y > pose[13].y and pose[12].y > pose[14].y and not inDownPos):
+                count += 1
+                inDownPos = True
+            else:
+                inDownPos = False
             
 
                 
