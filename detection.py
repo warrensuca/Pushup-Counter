@@ -2,7 +2,7 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 import time
-import np
+import numpy as np
 model_path = 'assets/pose_landmarker_full.task'
 
 BaseOptions = mp.tasks.BaseOptions
@@ -12,7 +12,7 @@ PoseLandmarkerResult = mp.tasks.vision.PoseLandmarkerResult
 VisionRunningMode = mp.tasks.vision.RunningMode
 
 latest_frame = None
-count = 1
+count = 0
 inDownPos = False
 
 POSE_CONNECTIONS = [
@@ -30,7 +30,15 @@ POSE_CONNECTIONS = [
 
 
 
-
+def getAngle(a, b, c):
+    
+    a = np.array([a.x, a.y])
+    b = np.array([b.x, b.y])
+    c = np.array([c.x, c.y])
+    ba = a - b
+    bc = c - b
+    cosine = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc) + 1e-6)
+    return np.degrees(np.arccos(np.clip(cosine, -1.0, 1.0)))
 
 
 def print_result(result: PoseLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
@@ -56,13 +64,21 @@ def print_result(result: PoseLandmarkerResult, output_image: mp.Image, timestamp
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 cv2.circle(frame, (cx, cy), 5, ( (0, 255, 0) if inDownPos else (111, 64, 125)), -1)
 
-            #pushup detection
+            #pushup detection, elbows minus shoulders
             
-            if(pose[11].y > pose[13].y and pose[12].y > pose[14].y and not inDownPos):
-                count += 1
+            if pose[13].y - pose[11].y <= 0.25 and pose[14].y - pose[12].y <= 0.25 and not inDownPos:
+            #if getAngle(pose[11], pose[13], pose[15]) < 150 and getAngle(pose[12], pose[14], pose[16]) < 150 and not inDownPos:
+                
+                
                 inDownPos = True
-            else:
+            
+            elif pose[13].y - pose[11].y >= 0.3 and pose[14].y - pose[12].y >= 0.3 and inDownPos:
+                count += 1
+                print(count)
+                
                 inDownPos = False
+            
+            cv2.putText(frame, str(count), (10, 250), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
             
 
                 
@@ -83,7 +99,9 @@ cap = cv2.VideoCapture(0)
 
 with PoseLandmarker.create_from_options(options) as landmarker:
     startTime = time.time_ns()
+    
     while cap.isOpened():
+        
         frame_timestamp_ms = (time.time_ns() - startTime) // 10**6
 
         success, image = cap.read()
@@ -97,6 +115,7 @@ with PoseLandmarker.create_from_options(options) as landmarker:
 
         if latest_frame is not None:
             cv2.imshow("PoseLandmarker", latest_frame)  # only called from main thread 
+            
             
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
