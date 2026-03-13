@@ -16,5 +16,11 @@ I created this project for practice with Computer Vision, and a tune up for a fu
 <h1>Methodology</h1>
 
 I used Google's MediaPipe as well as OpenCV to track 33 points of the body. The body parts I examined to register a pushup were the 
-shoulder and elbow. Oringally, I said if you shoulder is below your elbow, it is a pushup, but made changes to be more lenient. 
+shoulder and elbow. Originally, I said if the shoulder is below the elbow, it is a pushup, but made changes to be more lenient. I then
+chose to turn the detection points green for a visual cue that a successful pushup was performed. 
 
+<h1>Notes</h1>
+<ol>
+  <li>The camera window is an OpenCV window and does not have a native macOS close button — use Q to exit</li>
+  <li><b>Place your camera head on for best angle detection</b></li>
+</ol>
