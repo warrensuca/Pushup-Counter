@@ -62,12 +62,12 @@ def handlePose(result: PoseLandmarkerResult, output_image: mp.Image, timestamp_m
             for (a, b) in POSE_CONNECTIONS:
                 x1, y1 = int(pose[a].x * w), int(pose[a].y * h)
                 x2, y2 = int(pose[b].x * w), int(pose[b].y * h)
-                cv2.line(frame, (x1, y1), (x2, y2), ( (0, 255, 0) if in_down_pos else ( (255,0,0) if mode == 1 else (11, 64, 125))), 2)
+                cv2.line(frame, (x1, y1), (x2, y2), ( (0, 255, 0) if in_down_pos else ( (11, 64, 125))), 3)
 
             # dots
             for lm in pose:
                 cx, cy = int(lm.x * w), int(lm.y * h)
-                cv2.circle(frame, (cx, cy), 5, ( (0, 255, 0) if in_down_pos else ( (255,0,0) if mode == 1 else (11, 64, 125))), -1)
+                cv2.circle(frame, (cx, cy), 5, ( (0, 255, 0) if in_down_pos else ( (11, 64, 125))), -1)
 
             #pushup detection, elbows minus shoulders
             
@@ -88,7 +88,7 @@ def handlePose(result: PoseLandmarkerResult, output_image: mp.Image, timestamp_m
                     
 
                     
-            cv2.putText(frame, str(count), (10, 250), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(frame, str(count), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
             
 
                 
