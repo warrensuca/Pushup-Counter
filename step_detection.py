@@ -69,16 +69,16 @@ def handlePose(result: PoseLandmarkerResult, output_image: mp.Image, timestamp_m
 
         elif mode == "stepping" and isinstance(foot_pos, float):
 
-            midpoint = (knee_pos + foot_pos) / 2
-            lift_threshold = midpoint - 0.02
-            ground_threshold = midpoint + 0.02
+            threshold = 3 * (knee_pos + foot_pos) / 4
+            lift_threshold = threshold - 0.02
+            ground_threshold = threshold + 0.02
 
             if not left_foot_up and left_foot_y < lift_threshold:
                 left_foot_up = True
             elif left_foot_up and left_foot_y > ground_threshold:
                 step_text = "Left Step"
                 print("Left Step")
-                print(round(left_foot_y, 4), round(midpoint, 4))
+                print(round(left_foot_y, 4), round(threshold, 4))
                 left_foot_up = False
 
             if not right_foot_up and right_foot_y < lift_threshold:
@@ -86,7 +86,7 @@ def handlePose(result: PoseLandmarkerResult, output_image: mp.Image, timestamp_m
             elif right_foot_up and right_foot_y > ground_threshold:
                 step_text = "Right Step"
                 print("Right Step")
-                print(round(right_foot_y, 4), round(midpoint, 4))
+                print(round(right_foot_y, 4), round(threshold, 4))
                 right_foot_up = False
 
     base_frame = frame
